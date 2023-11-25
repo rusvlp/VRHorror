@@ -1,16 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class LighterController : MonoBehaviour
 {
 
+
     [Header("Settings")]
-    [SerializeField] private float _speedLimit;
+    [SerializeField] private float _speedUpperLimit;
+
+    [SerializeField] private float _speedLowerLimit;
 
     [SerializeField] private float _hinegeOpenSpeed;
+
+    [Header("Utils")] [SerializeField] private TMP_Text _isOpenedText;
     
-    [Header("Utils")]
     [SerializeField] private Transform _hinge;
     [SerializeField] private Transform _hand;
 
@@ -20,7 +26,8 @@ public class LighterController : MonoBehaviour
     [SerializeField] private float _ySpeed;
 
     [SerializeField] private bool _isOpened = false;
-    
+    [SerializeField] private float _delayTime;
+    [SerializeField] private bool _isOpenedLocked = false;
     void Start()
     {
         print("Sass");
@@ -30,26 +37,36 @@ public class LighterController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
         _currentYPos = _hand.transform.position.y;
         CalculateYSpeed();
         _previousYPos = _currentYPos;
-        
+
         OpenCloseLighter();
-       // print(_isOpened);
+
+        _isOpenedText.SetText(_isOpened.ToString());
+        // print(_isOpened);
     }
 
+    public IEnumerator StartDelay()
+    {
+        _isOpenedLocked = true;
+        yield return new WaitForSeconds(_delayTime);
+        _isOpenedLocked = false;
+    }
+    
     private void OpenCloseLighter()
     {
-        if (_ySpeed > _speedLimit && _ySpeed > 0)
+        if ((Mathf.Abs(_ySpeed) < _speedUpperLimit && Mathf.Abs(_ySpeed) > _speedLowerLimit) &&  !_isOpenedLocked)
         {
             if (_isOpened)
             {
                 _isOpened = false;
+                StartCoroutine(StartDelay());
             }
             else
             {
                 _isOpened = true;
+                StartCoroutine(StartDelay());
                 //StopCoroutine(RotateHinge2Open());
             }
         }
