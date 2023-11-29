@@ -15,7 +15,9 @@ public class LighterController : MonoBehaviour
 
     [SerializeField] private float _hinegeOpenSpeed;
 
-    [Header("Utils")] [SerializeField] private TMP_Text _isOpenedText;
+    [Header("Utils")] 
+    [SerializeField] private Animator _lighterAnimator;
+    [SerializeField] private TMP_Text _isOpenedText;
     
     [SerializeField] private Transform _hinge;
     [SerializeField] private Transform _hand;
@@ -30,6 +32,7 @@ public class LighterController : MonoBehaviour
     [SerializeField] private bool _isOpenedLocked = false;
     void Start()
     {
+        _lighterAnimator = GetComponent<Animator>();
         print("Sass");
       //  StartCoroutine(RotateHinge2Open());
     }
@@ -42,11 +45,14 @@ public class LighterController : MonoBehaviour
         _previousYPos = _currentYPos;
 
         OpenCloseLighter();
-
+        
+        _lighterAnimator.SetBool("isOpened", _isOpened);
+        
         _isOpenedText.SetText(_isOpened.ToString());
         // print(_isOpened);
     }
 
+   
     public IEnumerator StartDelay()
     {
         _isOpenedLocked = true;
